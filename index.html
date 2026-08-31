@@ -2,22 +2,84 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>MrROBLOX</title>
+  <title>MrROBUX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <section class="hero">
-    <video class="hero__video" autoplay muted loop playsinline preload="auto">
-      <source src="assets/video/bg.mp4" type="video/mp4">
-    </video>
+    <div class="hero__bg"></div>
     <div class="hero__overlay"></div>
 
+    <nav class="social-icons" aria-label="Redes sociales">
+      <a class="social-icon social-icon--youtube" href="https://www.youtube.com/@MrRobux-12" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <rect x="1" y="1" width="46" height="46" rx="10" fill="#ff2323"/>
+          <path d="M19 15 L34 24 L19 33 Z" fill="#fff"/>
+        </svg>
+      </a>
+      <span class="social-divider" aria-hidden="true"></span>
+      <a class="social-icon social-icon--tiktok" href="https://www.tiktok.com/@mrrobux121" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <rect x="1" y="1" width="46" height="46" rx="10" fill="#0b0b0f"/>
+          <path d="M27 9h5.2c.4 3 2.6 5.4 6 5.9v5.3c-2.4.1-4.5-.6-6.2-1.8v9.4c0 5.6-4.4 10-9.8 10-5.4 0-9.8-4.4-9.8-9.9 0-5.4 4.4-9.8 9.8-9.8.5 0 1 0 1.5.1v5.5a4.4 4.4 0 0 0-1.5-.3 4.5 4.5 0 1 0 4.5 4.6V9Z" fill="#25f4ee"/>
+          <path d="M25.6 9h5.2c.4 3 2.6 5.4 6 5.9v5.3c-2.4.1-4.5-.6-6.2-1.8v9.4c0 5.6-4.4 10-9.8 10-5.4 0-9.8-4.4-9.8-9.9 0-5.4 4.4-9.8 9.8-9.8.5 0 1 0 1.5.1v5.5a4.4 4.4 0 0 0-1.5-.3 4.5 4.5 0 1 0 4.5 4.6V9Z" fill="#fe2c55" opacity=".75"/>
+          <path d="M26.3 9h5.2c.4 3 2.6 5.4 6 5.9v5.3c-2.4.1-4.5-.6-6.2-1.8v9.4c0 5.6-4.4 10-9.8 10-5.4 0-9.8-4.4-9.8-9.9 0-5.4 4.4-9.8 9.8-9.8.5 0 1 0 1.5.1v5.5a4.4 4.4 0 0 0-1.5-.3 4.5 4.5 0 1 0 4.5 4.6V9Z" fill="#fff"/>
+        </svg>
+      </a>
+      <span class="social-divider" aria-hidden="true"></span>
+      <a class="social-icon social-icon--discord" href="https://discord.gg/TZdhZ5cW3z" target="_blank" rel="noopener noreferrer" aria-label="Discord">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <rect x="1" y="1" width="46" height="46" rx="10" fill="#5865f2"/>
+          <path d="M33.5 15.8c-1.9-.9-3.9-1.5-6-1.9l-.3.6c1.9.5 3.7 1.2 5.3 2.1-2.3-1.1-4.7-1.7-7.2-1.9a17 17 0 0 0-6.6 0c-2.5.2-4.9.8-7.2 1.9 1.6-.9 3.4-1.6 5.3-2.1l-.3-.6c-2.1.4-4.1 1-6 1.9-2.5 4-3.7 8.4-3.3 12.9 2.1 1.6 4.6 2.8 7.3 3.5l.9-1.5c-1.4-.5-2.8-1.2-4-2 .3.2.7.4 1 .6 3 1.6 6.3 2.5 9.7 2.5s6.7-.9 9.7-2.5c.3-.2.7-.4 1-.6-1.2.8-2.6 1.5-4 2l.9 1.5c2.7-.7 5.2-1.9 7.3-3.5.4-4.9-.9-9.2-3.5-12.9ZM19 27.2c-1.2 0-2.2-1.2-2.2-2.6s1-2.6 2.2-2.6 2.2 1.2 2.2 2.6-1 2.6-2.2 2.6Zm10 0c-1.2 0-2.2-1.2-2.2-2.6s1-2.6 2.2-2.6 2.2 1.2 2.2 2.6-1 2.6-2.2 2.6Z" fill="#fff"/>
+        </svg>
+      </a>
+    </nav>
+
     <div class="hero__content">
-      <div class="hero__logo">
-        <img src="assets/img/logo.svg" alt="MrROBLOX">
-      </div>
-      <button class="btn-iniciar" type="button">Iniciar</button>
+      <svg class="logo-svg" viewBox="0 0 950 260" role="img" aria-label="MrROBUX">
+        <defs>
+          <filter id="roughEdge" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.06" numOctaves="2" seed="7" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+          <mask id="diamondHole">
+            <rect x="0" y="0" width="950" height="260" fill="#fff"/>
+            <rect x="0" y="0" width="60" height="60" rx="8" fill="#000" transform="translate(500 95) rotate(22)"/>
+          </mask>
+          <style>
+            .word {
+              font-family: 'Arial Black', 'Arial Narrow', Impact, Haettenschweiler, sans-serif;
+              font-weight: 900;
+              fill: #ffffff;
+              stroke: #14161c;
+              stroke-width: 4;
+              paint-order: stroke fill;
+            }
+          </style>
+        </defs>
+
+        <g filter="url(#roughEdge)">
+          <g class="logo-letter logo-letter--1">
+            <text x="10" y="190" font-size="150" class="word">Mr</text>
+          </g>
+          <g class="logo-letter logo-letter--2">
+            <text x="235" y="200" font-size="185" class="word">R</text>
+          </g>
+          <g class="logo-letter logo-letter--3" mask="url(#diamondHole)">
+            <rect x="0" y="0" width="118" height="118" rx="14"
+                  fill="#ffffff" stroke="#14161c" stroke-width="6"
+                  transform="translate(468 60) rotate(22)"/>
+          </g>
+          <g transform="translate(586 0) skewX(-6)">
+            <g class="logo-letter logo-letter--4">
+              <text x="0" y="190" font-size="150" letter-spacing="-2" class="word">BUX</text>
+            </g>
+          </g>
+        </g>
+      </svg>
+
+      <a class="btn-iniciar" href="segunda.html">Iniciar</a>
     </div>
   </section>
 </body>
