@@ -1,12 +1,49 @@
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ---------- Notificacion por correo cuando hay un ganador ----------
+// EMAIL_USER / EMAIL_PASS se configuran como variables de entorno en Railway
+// (nunca se guardan en el codigo). NOTIFY_EMAIL es opcional, por defecto
+// llega al correo del dueño de la pagina.
+const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || 'ariyairdiaz75@gmail.com';
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+
+let mailer = null;
+if (EMAIL_USER && EMAIL_PASS) {
+  mailer = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: EMAIL_USER, pass: EMAIL_PASS }
+  });
+} else {
+  console.log('Aviso: EMAIL_USER/EMAIL_PASS no configurados. No se enviaran correos de ganador (revisa el README).');
+}
+
+async function sendWinnerEmail(winner, participantsAtSpin) {
+  if (!mailer || !winner) return;
+  try {
+    await mailer.sendMail({
+      from: EMAIL_USER,
+      to: NOTIFY_EMAIL,
+      subject: '🎉 Nuevo ganador en la ruleta de MrROBUX',
+      text:
+        'El ganador del sorteo es: ' + winner + '\n\n' +
+        'Participantes en este sorteo: ' + (participantsAtSpin.join(', ') || '(ninguno)') + '\n\n' +
+        'Fecha: ' + new Date().toLocaleString('es-ES')
+    });
+    console.log('Correo de ganador enviado a ' + NOTIFY_EMAIL);
+  } catch (err) {
+    console.log('No se pudo enviar el correo de ganador:', err.message);
+  }
+}
 
 const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
@@ -123,10 +160,12 @@ app.post('/api/spin', async (req, res) => {
     // Todo esto corre dentro de la misma cola de escritura (withFile), asi que
     // aunque lleguen varias peticiones para el mismo slotKey al mismo tiempo,
     // solo la primera calcula un ganador nuevo; el resto recibe ese mismo resultado.
+    let isNewSpin = false;
     const result = await withFile(SPIN_FILE, (existing) => {
       if (existing && existing.slotKey === String(slotKey)) {
         return existing;
       }
+      isNewSpin = true;
       const participants = readJSON(PARTICIPANTS_FILE);
       let winner = null;
       if (participants.length > 0) {
@@ -141,6 +180,12 @@ app.post('/api/spin', async (req, res) => {
         at: new Date().toISOString()
       };
     });
+
+    // Solo se avisa por correo cuando este sorteo se acaba de decidir de verdad
+    // (no cuando otro visitante ya lo habia disparado y solo se repite el resultado).
+    if (isNewSpin) {
+      sendWinnerEmail(result.winner, result.participantsAtSpin);
+    }
 
     res.json({ ok: true, ...result });
   } catch (err) {

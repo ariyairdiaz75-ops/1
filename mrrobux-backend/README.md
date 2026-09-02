@@ -18,7 +18,8 @@ primera vez que arranca). No necesitas instalar ninguna base de datos aparte.
 - `POST /api/participar` — añade a alguien a la ruleta (rebanada de pizza).
 - `POST /api/spin` — hace el sorteo. Está diseñado para que, aunque varias
   personas tengan la página abierta a la misma hora programada, **solo se
-  elija un ganador real** y todos vean el mismo resultado.
+  elija un ganador real** y todos vean el mismo resultado. Cuando hay un
+  ganador, manda un correo de aviso (ver sección de abajo).
 
 ## Probarlo en tu computadora (opcional, antes de subirlo)
 
@@ -73,11 +74,39 @@ La forma más simple, gratis y sin tarjeta de crédito es **Render**:
   a una base de datos de verdad (por ejemplo Postgres, que Render también
   ofrece gratis). Dime si quieres que lo dejemos así de robusto y lo hacemos.
 
+## Correo cuando alguien gana la ruleta
+
+Cada vez que se hace un sorteo real (no cuando se repite el mismo resultado a
+otro visitante), el servidor manda un correo a **ariyairdiaz75@gmail.com**
+avisando quién ganó.
+
+Para que esto funcione necesitas darle al servidor una cuenta de Gmail desde
+la que enviar el correo (puede ser la misma tuya). Como Google no deja usar
+tu contraseña normal para esto, hay que crear una "Contraseña de aplicación":
+
+1. Entra a tu cuenta de Google → **Seguridad** → activa la
+   **Verificación en dos pasos** (si no la tienes activada, tienes que
+   activarla primero, es obligatorio para el siguiente paso).
+2. Ve a https://myaccount.google.com/apppasswords
+3. Ponle un nombre (por ejemplo "MrROBUX") y dale **Crear**. Te va a dar una
+   contraseña de 16 letras — cópiala (solo se muestra una vez).
+4. En Railway, entra a tu servicio → pestaña **Variables** → agrega:
+   - `EMAIL_USER` = tu correo de Gmail (el que envía, ej. `ariyairdiaz75@gmail.com`)
+   - `EMAIL_PASS` = la contraseña de 16 letras que te dio Google (sin espacios)
+5. Guarda — Railway vuelve a desplegar solo con las nuevas variables.
+
+Si no configuras estas dos variables, la página sigue funcionando igual de
+bien, solo que no se manda el correo (el servidor lo avisa en los logs).
+
+Si alguna vez quieres que el aviso llegue a otro correo en vez de
+`ariyairdiaz75@gmail.com`, agrega también la variable `NOTIFY_EMAIL` con la
+dirección que quieras.
+
 ## Estructura
 
 ```
 mrrobux-backend/
   server.js       <- toda la lógica del servidor
-  package.json    <- dependencias (express, cors, bcryptjs)
+  package.json    <- dependencias (express, cors, bcryptjs, nodemailer)
   data/           <- se crea sola: users.json, participants.json, lastSpin.json
 ```
