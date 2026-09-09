@@ -19,7 +19,32 @@ primera vez que arranca). No necesitas instalar ninguna base de datos aparte.
 - `POST /api/spin` — hace el sorteo. Está diseñado para que, aunque varias
   personas tengan la página abierta a la misma hora programada, **solo se
   elija un ganador real** y todos vean el mismo resultado. Cuando hay un
-  ganador, manda un correo de aviso (ver sección de abajo).
+  ganador, manda un correo de aviso (ver sección de abajo) y lo anuncia en
+  el chat de la comunidad.
+
+## Administrador (`elchinonmms`)
+
+Solo la cuenta con usuario **elchinonmms** puede hacer estas acciones. Como
+este servidor no maneja "sesiones", cada acción de administrador vuelve a
+mandar su contraseña junto con la petición para comprobar que sí es él
+(el navegador la guarda solo en memoria mientras dura la sesión, nunca en
+el disco del usuario):
+
+- `POST /api/admin/spin-config` — cambia la hora en que gira la ruleta.
+- `POST /api/admin/remove-participant` — quita a alguien de la ruleta.
+- `POST /api/admin/matches` — crea una partida privada.
+- `POST /api/admin/matches/:id/start` — la marca como EN VIVO.
+- `POST /api/admin/matches/:id/finish` — la finaliza.
+
+## Partidas privadas y comunidad
+
+- `GET /api/matches` / `POST /api/matches/:id/join` — listar y unirse a
+  partidas. Al llenarse (`maxPlayers`), nadie más se puede unir. El enlace
+  (`link`) de la partida solo se lo devuelve el frontend a quienes ya están
+  en `participants`.
+- `GET /api/chat` / `POST /api/chat` — chat global de solo texto (emojis y
+  links a gifs incluidos como texto; nunca se acepta subir archivos ni
+  videos porque no existe ningún campo para eso).
 
 ## Probarlo en tu computadora (opcional, antes de subirlo)
 
