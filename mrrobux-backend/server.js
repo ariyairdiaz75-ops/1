@@ -62,6 +62,7 @@ const SPIN_FILE = path.join(DATA_DIR, 'lastSpin.json');
 const SPIN_CONFIG_FILE = path.join(DATA_DIR, 'spinConfig.json');
 const MATCHES_FILE = path.join(DATA_DIR, 'matches.json');
 const CHAT_FILE = path.join(DATA_DIR, 'chat.json');
+const RULETA_TAREAS_FILE = path.join(DATA_DIR, 'ruletaTareas.json');
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '{}');
@@ -70,6 +71,11 @@ if (!fs.existsSync(SPIN_FILE)) fs.writeFileSync(SPIN_FILE, 'null');
 if (!fs.existsSync(SPIN_CONFIG_FILE)) fs.writeFileSync(SPIN_CONFIG_FILE, JSON.stringify({ hours: [12] }));
 if (!fs.existsSync(MATCHES_FILE)) fs.writeFileSync(MATCHES_FILE, '[]');
 if (!fs.existsSync(CHAT_FILE)) fs.writeFileSync(CHAT_FILE, '[]');
+// Tareas 1-4 de la ruleta: los 4 links que pone el anfitrion y quien ya los hizo.
+// "round" sube en cada sorteo; al subir, se borran los links y lo completado.
+if (!fs.existsSync(RULETA_TAREAS_FILE)) {
+  fs.writeFileSync(RULETA_TAREAS_FILE, JSON.stringify({ round: 1, links: ['', '', '', ''], completed: {} }, null, 2));
+}
 
 function readJSON(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -200,6 +206,16 @@ app.post('/api/participar', async (req, res) => {
   if (!username) return res.status(400).json({ ok: false, error: 'Falta el usuario.' });
   const name = String(username).trim();
 
+  // No basta con la paloma del navegador: aqui se vuelve a comprobar que hizo
+  // todas las tareas que el anfitrion dejo con link.
+  const faltan = ruletaTareasPendientes(readRuletaTareas(), name);
+  if (faltan.length) {
+    return res.status(400).json({
+      ok: false,
+      error: 'Todavia te faltan las tareas: ' + faltan.join(', ') + '.'
+    });
+  }
+
   const participants = await withFile(PARTICIPANTS_FILE, (data) => {
     if (!data.includes(name)) data.push(name);
     return data;
@@ -248,6 +264,14 @@ app.post('/api/spin', async (req, res) => {
       }
       // nueva ronda: se limpia la lista de participantes para el siguiente sorteo
       writeJSON(PARTICIPANTS_FILE, []);
+      // y las tareas 1-4 vuelven a empezar: se borran las palomas y los links,
+      // asi el anfitrion pone unos nuevos para la siguiente ronda.
+      const tareas = readJSON(RULETA_TAREAS_FILE);
+      writeJSON(RULETA_TAREAS_FILE, {
+        round: (Number(tareas.round) || 1) + 1,
+        links: ['', '', '', ''],
+        completed: {}
+      });
       return {
         slotKey: String(slotKey),
         winner,
@@ -270,6 +294,85 @@ app.post('/api/spin', async (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, error: 'Error al girar la ruleta.' });
   }
+});
+
+// ---------- Tareas 1-4 de la ruleta ----------
+// El anfitrion pone un link por tarea. El participante entra al link y al final
+// vuelve a la pagina con ?done=N, que marca la paloma. Solo cuenta una vez.
+function readRuletaTareas() {
+  const data = readJSON(RULETA_TAREAS_FILE);
+  return {
+    round: Number(data.round) || 1,
+    links: Array.isArray(data.links) ? data.links.slice(0, 4) : ['', '', '', ''],
+    completed: data.completed && typeof data.completed === 'object' ? data.completed : {}
+  };
+}
+
+function completedFor(data, username) {
+  const list = data.completed[String(username || '').toLowerCase()];
+  const out = [false, false, false, false];
+  if (Array.isArray(list)) for (let i = 0; i < 4; i++) out[i] = !!list[i];
+  return out;
+}
+
+// Hay que hacer las 4 tareas para entrar a la ruleta. Si el anfitrion todavia
+// no puso los links de la ronda, nadie puede participar hasta que los ponga.
+function ruletaTareasPendientes(data, username) {
+  const done = completedFor(data, username);
+  const faltan = [];
+  for (let i = 0; i < 4; i++) {
+    if (!done[i]) faltan.push(i + 1);
+  }
+  return faltan;
+}
+
+app.get('/api/ruleta-tareas', (req, res) => {
+  const data = readRuletaTareas();
+  const username = String(req.query.username || '');
+  res.json({
+    ok: true,
+    round: data.round,
+    links: data.links,
+    completed: completedFor(data, username),
+    pendientes: ruletaTareasPendientes(data, username)
+  });
+});
+
+app.post('/api/admin/ruleta-tareas', async (req, res) => {
+  const { adminUser, adminPassword, links } = req.body || {};
+  if (!(await verifyAdmin(adminUser, adminPassword))) {
+    return res.status(403).json({ ok: false, error: 'Solo el anfitrion puede cambiar los links.' });
+  }
+  if (!Array.isArray(links) || links.length !== 4) {
+    return res.status(400).json({ ok: false, error: 'Manda los 4 links.' });
+  }
+  const limpios = links.map((l) => String(l || '').trim().slice(0, 500));
+  const data = await withFile(RULETA_TAREAS_FILE, (d) => {
+    d.links = limpios;
+    return d;
+  });
+  res.json({ ok: true, round: data.round, links: data.links });
+});
+
+app.post('/api/ruleta-tareas/completar', async (req, res) => {
+  const { username, index } = req.body || {};
+  const i = Number(index) - 1;
+  if (!username) return res.status(400).json({ ok: false, error: 'Falta el usuario.' });
+  if (!(i >= 0 && i < 4)) return res.status(400).json({ ok: false, error: 'Tarea no valida.' });
+
+  const key = String(username).trim().toLowerCase();
+  const data = await withFile(RULETA_TAREAS_FILE, (d) => {
+    if (!d.completed || typeof d.completed !== 'object') d.completed = {};
+    if (!Array.isArray(d.completed[key])) d.completed[key] = [false, false, false, false];
+    d.completed[key][i] = true;
+    return d;
+  });
+
+  res.json({
+    ok: true,
+    round: Number(data.round) || 1,
+    completed: completedFor(readRuletaTareas(), username)
+  });
 });
 
 // ---------- Partidas privadas ----------

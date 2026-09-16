@@ -653,6 +653,37 @@
   .ref-msg{ margin-top:16px; font-size:.9rem; font-weight:700; line-height:1.5; }
   .ref-msg.ok{ color:var(--green); }
   .ref-msg.bad{ color:var(--red); }
+
+  /* ---------------- tareas 1-4 de la ruleta ---------------- */
+  .tarea-link-row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .tarea-link-row .tl-num{
+    flex-shrink:0; width:24px; height:24px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    color:#fff; font-weight:800; font-size:.75rem;
+  }
+  .tarea-link-row input{ flex:1; min-width:0; }
+  .tl-copy{
+    appearance:none; border:none; cursor:pointer; padding:7px 9px; border-radius:9px;
+    font-weight:800; font-size:.72rem; color:#3a1a00; white-space:nowrap;
+    background:linear-gradient(90deg,var(--gold),#ffb703);
+  }
+  .admin-hint{ font-size:.72rem; color:var(--muted); line-height:1.5; margin-top:6px; }
+  .mission-play:disabled{ cursor:not-allowed; background:rgba(255,255,255,.08); }
+  .mission-play:disabled:hover{ transform:none; }
+
+  /* ---------------- pagina 9: tarea finalizada ---------------- */
+  .done-wrap{ display:flex; justify-content:center; padding: 10vh 20px; }
+  .done-card{
+    width:100%; max-width:420px; text-align:center;
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:38px 28px; backdrop-filter: blur(16px);
+    box-shadow:0 30px 80px rgba(0,0,0,.45);
+  }
+  .done-card .done-ic{ font-size:3.4rem; }
+  .done-card h2{ font-size:1.6rem; font-weight:800; margin:12px 0 8px; color:var(--green); }
+  .done-card p{ color:var(--muted); font-size:.9rem; line-height:1.55; }
+  .done-card .cta{ margin-top:22px; }
 </style>
 </head>
 <body>
@@ -870,6 +901,38 @@
           </div>
           <div class="form-error" id="adminSpinHourMsg"></div>
 
+
+          <div class="participants-admin" id="adminTareasBox">
+            <div class="p-title">🔗 Links de las tareas 1-4 (a dónde manda cada botón):</div>
+            <div class="tarea-link-row">
+              <span class="tl-num">1</span>
+              <input type="text" id="adminTareaLink1" placeholder="https://tu-acortador/...">
+              <button class="tl-copy" type="button" onclick="copiarLinkRetorno(1,this)">Link de retorno</button>
+            </div>
+            <div class="tarea-link-row">
+              <span class="tl-num">2</span>
+              <input type="text" id="adminTareaLink2" placeholder="https://tu-acortador/...">
+              <button class="tl-copy" type="button" onclick="copiarLinkRetorno(2,this)">Link de retorno</button>
+            </div>
+            <div class="tarea-link-row">
+              <span class="tl-num">3</span>
+              <input type="text" id="adminTareaLink3" placeholder="https://tu-acortador/...">
+              <button class="tl-copy" type="button" onclick="copiarLinkRetorno(3,this)">Link de retorno</button>
+            </div>
+            <div class="tarea-link-row">
+              <span class="tl-num">4</span>
+              <input type="text" id="adminTareaLink4" placeholder="https://tu-acortador/...">
+              <button class="tl-copy" type="button" onclick="copiarLinkRetorno(4,this)">Link de retorno</button>
+            </div>
+            <button class="admin-mini-btn" type="button" onclick="saveRuletaLinks()">Guardar links</button>
+            <div class="form-error" id="adminTareasMsg"></div>
+            <div class="admin-hint">
+              "Link de retorno" copia la dirección de MrROBUX donde tiene que terminar cada tarea.
+              Ponla como destino en tu acortador y pega el link corto que te dé en la casilla de esa tarea.
+              Al girar la ruleta estos 4 links se borran y pones unos nuevos.
+            </div>
+          </div>
+
           <div class="participants-admin">
             <div class="p-title">Participantes actuales (puedes quitarlos):</div>
             <div id="participantsAdminList"></div>
@@ -878,46 +941,46 @@
       </div>
 
       <div class="panel missions-panel">
-        <h3>Lee los consejos y gana tu lugar</h3>
+        <h3>Haz las tareas y gana tu lugar</h3>
 
         <div class="mission-card">
-          <button class="mission-play" data-row="1" onclick="openAd(1)" title="Consejo 1">
+          <button class="mission-play" data-row="1" onclick="abrirTareaRuleta(1)" title="Tarea 1">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
           </button>
-          <div class="mission-info"><div class="t">Consejo 1</div><div class="d">Trucos y recomendaciones de la comunidad</div></div>
+          <div class="mission-info"><div class="t">Tarea 1</div><div class="d" id="tareaDesc1">Cargando…</div></div>
           <div class="mission-check" id="check1"><svg viewBox="0 0 24 24"><path fill="#4ade80" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></div>
           <div class="mission-label" id="checkLabel1">0/1</div>
         </div>
 
         <div class="mission-card">
-          <button class="mission-play" data-row="2" onclick="openAd(2)" title="Consejo 2">
+          <button class="mission-play" data-row="2" onclick="abrirTareaRuleta(2)" title="Tarea 2">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
           </button>
-          <div class="mission-info"><div class="t">Consejo 2</div><div class="d">Trucos y recomendaciones de la comunidad</div></div>
+          <div class="mission-info"><div class="t">Tarea 2</div><div class="d" id="tareaDesc2">Cargando…</div></div>
           <div class="mission-check" id="check2"><svg viewBox="0 0 24 24"><path fill="#4ade80" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></div>
           <div class="mission-label" id="checkLabel2">0/1</div>
         </div>
 
         <div class="mission-card">
-          <button class="mission-play" data-row="3" onclick="openAd(3)" title="Consejo 3">
+          <button class="mission-play" data-row="3" onclick="abrirTareaRuleta(3)" title="Tarea 3">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
           </button>
-          <div class="mission-info"><div class="t">Consejo 3</div><div class="d">Trucos y recomendaciones de la comunidad</div></div>
+          <div class="mission-info"><div class="t">Tarea 3</div><div class="d" id="tareaDesc3">Cargando…</div></div>
           <div class="mission-check" id="check3"><svg viewBox="0 0 24 24"><path fill="#4ade80" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></div>
           <div class="mission-label" id="checkLabel3">0/1</div>
         </div>
 
         <div class="mission-card">
-          <button class="mission-play" data-row="4" onclick="openAd(4)" title="Consejo 4">
+          <button class="mission-play" data-row="4" onclick="abrirTareaRuleta(4)" title="Tarea 4">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
           </button>
-          <div class="mission-info"><div class="t">Consejo 4</div><div class="d">Trucos y recomendaciones de la comunidad</div></div>
+          <div class="mission-info"><div class="t">Tarea 4</div><div class="d" id="tareaDesc4">Cargando…</div></div>
           <div class="mission-check" id="check4"><svg viewBox="0 0 24 24"><path fill="#4ade80" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></div>
           <div class="mission-label" id="checkLabel4">0/1</div>
         </div>
 
         <button class="cta big" id="participarBtn" disabled onclick="participar()" style="margin-top:8px;">Participar</button>
-        <div class="participar-hint" id="participarHint">Lee los 4 consejos para participar</div>
+        <div class="participar-hint" id="participarHint">Completa las 4 tareas para participar</div>
 
         <!-- ============================================================
              BLOQUE DE ANUNCIO NORMAL (NO incentivado)
@@ -1116,6 +1179,22 @@
   </div>
 </section>
 
+
+<!-- ================= PAGINA 9: TAREA FINALIZADA ================= -->
+<section class="page" id="page9">
+  <header class="topbar">
+    <div class="brand">MrROBUX</div>
+  </header>
+  <div class="done-wrap">
+    <div class="done-card">
+      <div class="done-ic" id="doneIcon">✅</div>
+      <h2 id="doneTitle">Finalizado</h2>
+      <p id="doneText">Tu tarea quedó completada. Te regresamos a la ruleta…</p>
+      <button class="cta" type="button" onclick="volverALaRuleta()">Volver a la ruleta</button>
+    </div>
+  </div>
+</section>
+
 <!-- ============ MODAL: crear partida (solo admin) ============ -->
 <div class="modal-bg" id="createMatchModalBg">
   <div class="modal-card wide">
@@ -1217,18 +1296,6 @@
 </div>
 
 
-<!-- modal de consejo (contenido propio, SIN anuncios de AdSense aquí a propósito:
-     mostrar/recompensar la visualización de un anuncio real dentro de este modal
-     está prohibido por las políticas de tráfico inválido de Google AdSense) -->
-<div class="modal-bg" id="adModalBg">
-  <div class="modal-card">
-    <h3 id="adModalTitle">Consejo 1</h3>
-    <div id="adSlotContainer">Cargando consejo...</div>
-    <div class="ad-timer" id="adTimer">Puedes cerrar en 5s...</div>
-    <button class="ad-close-btn" id="adCloseBtn" disabled onclick="closeAd()">Cerrar</button>
-  </div>
-</div>
-
 <script>
   /* ================== CONEXIÓN CON TU BACKEND ================== */
   // Pon aquí la URL de tu backend ya desplegado (Railway, Render, etc.)
@@ -1264,66 +1331,230 @@
   var currentPassword = ''; // solo en memoria, para las acciones de administrador
   var isAdminUser = false;
   var ADMIN_USERNAME_CLIENT = 'elchinonmms';
-  var tasksCompleted = [false, false, false, false];
-  var activeAdIndex = null;
-  var adCountdownInterval = null;
-  var AD_DURATION = 5; // segundos de lectura del consejo (no ligado a ningun anuncio)
+  /* ================== TAREAS 1-4 DE LA RULETA ================== */
+  // El anfitrion pone un link por tarea. El participante entra al link y ese
+  // link termina en esta misma pagina con ?done=N, que le pone la paloma.
+  var ruletaTareas = { round: 1, links: ['','','',''], completed: [false,false,false,false], pendientes: [] };
+  var PEND_KEY = 'mrrobux_tarea_pendiente';
 
-  // Contenido propio de la comunidad, sin relación con publicidad de AdSense.
-  var COMMUNITY_TIPS = [
-    'Nunca compartas tu contraseña de Roblox con nadie, ni siquiera si aseguran ser del soporte oficial.',
-    'Desconfía de cualquier sitio que te pida iniciar sesión en Roblox fuera de roblox.com para "regalarte" Robux.',
-    'Activa la verificación en dos pasos en tu cuenta de Roblox para protegerla mejor.',
-    'Reporta a cualquier usuario que te pida datos personales o intente venderte objetos fuera de la plataforma oficial.'
-  ];
+  function linkRetornoTarea(n){
+    return location.origin + location.pathname + '?done=' + n;
+  }
 
-  function openAd(index){
-    if(tasksCompleted[index-1]) return;
-    activeAdIndex = index;
-    document.getElementById('adModalTitle').textContent = 'Consejo ' + index;
-    document.getElementById('adSlotContainer').textContent = COMMUNITY_TIPS[index-1] || '';
-    var btn = document.getElementById('adCloseBtn');
-    btn.disabled = true;
-    btn.classList.remove('ready');
-    document.getElementById('adModalBg').classList.add('open');
+  function copiarLinkRetorno(n, btn){
+    copyText(linkRetornoTarea(n), btn);
+  }
 
-    var remaining = AD_DURATION;
-    document.getElementById('adTimer').textContent = 'Puedes cerrar en ' + remaining + 's...';
-    clearInterval(adCountdownInterval);
-    adCountdownInterval = setInterval(function(){
-      remaining--;
-      if(remaining <= 0){
-        clearInterval(adCountdownInterval);
-        document.getElementById('adTimer').textContent = '¡Listo!';
-        btn.disabled = false;
-        btn.classList.add('ready');
-      } else {
-        document.getElementById('adTimer').textContent = 'Puedes cerrar en ' + remaining + 's...';
+  async function loadRuletaTareas(){
+    if(!currentUsername) return;
+    try{
+      var data = await apiGet('/api/ruleta-tareas?username=' + encodeURIComponent(currentUsername));
+      ruletaTareas = {
+        round: data.round || 1,
+        links: data.links || ['','','',''],
+        completed: data.completed || [false,false,false,false],
+        pendientes: data.pendientes || []
+      };
+      renderRuletaTareas();
+    }catch(err){ /* se vuelve a intentar al entrar al panel */ }
+  }
+
+  function renderRuletaTareas(){
+    for(var i=1; i<=4; i++){
+      var link = String(ruletaTareas.links[i-1] || '').trim();
+      var hecha = !!ruletaTareas.completed[i-1];
+
+      var check = document.getElementById('check' + i);
+      var label = document.getElementById('checkLabel' + i);
+      var play  = document.querySelector('.mission-play[data-row="' + i + '"]');
+      var desc  = document.getElementById('tareaDesc' + i);
+
+      if(check) check.classList.toggle('done', hecha);
+      if(label) label.textContent = hecha ? '1/1' : '0/1';
+      if(play){
+        play.classList.toggle('done', hecha);
+        play.disabled = hecha || !link;
       }
-    }, 1000);
-  }
-
-  function closeAd(){
-    if(document.getElementById('adCloseBtn').disabled) return;
-    document.getElementById('adModalBg').classList.remove('open');
-    if(activeAdIndex){
-      completeTask(activeAdIndex);
-      activeAdIndex = null;
+      if(desc){
+        if(hecha) desc.textContent = '✅ Ya la completaste';
+        else if(link) desc.textContent = 'Entra al link para completarla';
+        else desc.textContent = 'El anfitrión todavía no puso el link';
+      }
     }
-  }
 
-  function completeTask(index){
-    tasksCompleted[index-1] = true;
-    document.getElementById('check' + index).classList.add('done');
-    document.getElementById('checkLabel' + index).textContent = '1/1';
-    var playBtn = document.querySelector('.mission-play[data-row="' + index + '"]');
-    if(playBtn) playBtn.classList.add('done');
+    // Los inputs del anfitrion muestran lo que hay guardado.
+    if(isAdmin()){
+      for(var j=1; j<=4; j++){
+        var input = document.getElementById('adminTareaLink' + j);
+        if(input && document.activeElement !== input) input.value = ruletaTareas.links[j-1] || '';
+      }
+    }
 
-    if(tasksCompleted.every(function(t){ return t; })){
-      var pBtn = document.getElementById('participarBtn');
+    var pBtn = document.getElementById('participarBtn');
+    var hint = document.getElementById('participarHint');
+    var faltan = ruletaTareas.pendientes || [];
+    var yaDentro = currentUsername && participants.some(function(p){
+      return String(p).toLowerCase() === currentUsername.toLowerCase();
+    });
+
+    if(!pBtn) return;
+    if(yaDentro){
+      pBtn.disabled = true;
+      if(hint) hint.textContent = '✅ Ya estás en la ruleta. Espera al próximo giro.';
+    } else if(faltan.length === 0){
       pBtn.disabled = false;
-      document.getElementById('participarHint').textContent = '¡Ya puedes participar!';
+      if(hint) hint.textContent = '¡Ya puedes participar!';
+    } else {
+      pBtn.disabled = true;
+      // Si el anfitrión todavía no puso los links, el participante no puede
+      // hacer nada: mejor decírselo que listarle tareas que no existen.
+      var sinLinks = ruletaTareas.links.filter(function(l){ return !String(l || '').trim(); }).length;
+      if(hint){
+        hint.textContent = sinLinks === 4
+          ? 'El anfitrión todavía no puso las tareas de esta ronda.'
+          : 'Te faltan las tareas: ' + faltan.join(', ');
+      }
     }
+  }
+
+  function abrirTareaRuleta(n){
+    var link = String(ruletaTareas.links[n-1] || '').trim();
+    if(ruletaTareas.completed[n-1]) return;
+    if(!link){
+      alert('El anfitrión todavía no puso el link de la tarea ' + n + '.');
+      return;
+    }
+    if(!/^https?:\/\//i.test(link)){
+      alert('El link de la tarea ' + n + ' no es válido.');
+      return;
+    }
+    // Marca que esta tarea se abrió desde aquí: la página de "Finalizado" solo
+    // cuenta si la persona salió de este botón.
+    try{ sessionStorage.setItem(PEND_KEY, String(n)); }catch(e){}
+    location.href = link;
+  }
+
+  async function saveRuletaLinks(){
+    var msg = document.getElementById('adminTareasMsg');
+    msg.style.color = 'var(--red)';
+    msg.textContent = '';
+    if(!currentPassword){
+      msg.textContent = 'Vuelve a iniciar sesión para guardar los links.';
+      return;
+    }
+    var links = [];
+    for(var i=1; i<=4; i++){
+      links.push(document.getElementById('adminTareaLink' + i).value.trim());
+    }
+    try{
+      var data = await apiPost('/api/admin/ruleta-tareas', {
+        adminUser: currentUsername, adminPassword: currentPassword, links: links
+      });
+      ruletaTareas.links = data.links || links;
+      renderRuletaTareas();
+      msg.style.color = 'var(--green)';
+      msg.textContent = '¡Links guardados!';
+    }catch(err){
+      msg.textContent = err.message;
+    }
+  }
+
+  /* ---------- pagina de "Finalizado" (?done=N) ---------- */
+  var donePageIndex = null;
+
+  function checkDonePage(){
+    var raw = getQueryParam('done');
+    if(!raw) return false;
+    var n = Number(raw);
+    if(!(n >= 1 && n <= 4)) return false;
+    donePageIndex = n;
+    goToPage(9);
+    // Se quita ?done= de la barra para que al recargar no se repita.
+    try{ history.replaceState({}, '', location.pathname); }catch(e){}
+    finalizarTareaRuleta(n);
+    return true;
+  }
+
+  async function finalizarTareaRuleta(n){
+    var title = document.getElementById('doneTitle');
+    var text = document.getElementById('doneText');
+    var icon = document.getElementById('doneIcon');
+
+    var pend = null;
+    try{ pend = sessionStorage.getItem(PEND_KEY); }catch(e){}
+    try{ sessionStorage.removeItem(PEND_KEY); }catch(e){}
+
+    if(!currentUsername){
+      icon.textContent = '🔒';
+      title.textContent = 'Finalizado';
+      title.style.color = 'var(--gold)';
+      text.textContent = 'Inicia sesión y vuelve a abrir la tarea ' + n + ' para que se te guarde la paloma.';
+      return;
+    }
+    if(pend !== String(n)){
+      icon.textContent = '⚠️';
+      title.textContent = 'Finalizado';
+      title.style.color = 'var(--gold)';
+      text.textContent = 'Abre la tarea ' + n + ' desde el botón de la ruleta para que cuente.';
+      return;
+    }
+
+    try{
+      var data = await apiPost('/api/ruleta-tareas/completar', { username: currentUsername, index: n });
+      ruletaTareas.completed = data.completed || ruletaTareas.completed;
+      text.textContent = 'Tarea ' + n + ' completada. Te regresamos a la ruleta…';
+      setTimeout(volverALaRuleta, 2200);
+    }catch(err){
+      icon.textContent = '⚠️';
+      title.style.color = 'var(--gold)';
+      text.textContent = 'No se pudo guardar la tarea: ' + err.message;
+    }
+  }
+
+  function volverALaRuleta(){
+    if(!currentUsername){ goToPage(2); return; }
+    goToPage(3);
+    showMainTab('ruleta');
+    loadRuletaTareas();
+  }
+
+  /* ================== SESION (para volver de los links) ================== */
+  // Se guarda en sessionStorage: dura solo mientras la pestaña este abierta y
+  // sirve para que al volver de un link la persona siga dentro de su cuenta.
+  var SESSION_KEY = 'mrrobux_sesion';
+
+  function guardarSesion(){
+    try{
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+        u: currentUsername, p: currentPassword, a: isAdminUser
+      }));
+    }catch(e){}
+  }
+  function borrarSesion(){
+    try{ sessionStorage.removeItem(SESSION_KEY); }catch(e){}
+  }
+  function restaurarSesion(){
+    try{
+      var raw = sessionStorage.getItem(SESSION_KEY);
+      if(!raw) return false;
+      var s = JSON.parse(raw);
+      if(!s || !s.u) return false;
+      currentUsername = s.u;
+      currentPassword = s.p || '';
+      isAdminUser = !!s.a;
+      aplicarDatosUsuario();
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function aplicarDatosUsuario(){
+    var badge = document.getElementById('wheelUsername');
+    if(badge) badge.textContent = '@' + currentUsername;
+    var panelName = document.getElementById('userPanelName');
+    if(panelName) panelName.textContent = '@' + currentUsername;
+    var avatar = document.getElementById('userAvatar');
+    if(avatar) avatar.textContent = currentUsername.charAt(0).toUpperCase();
+    applyAdminUI();
   }
 
   async function participar(){
@@ -1336,6 +1567,7 @@
       participants = data.participants || [];
       renderWheel();
       renderParticipantsAdminList();
+      renderRuletaTareas();
       alert('¡Perfecto, ' + name + '! Ya estás dentro de la ruleta. Espera al próximo giro.');
     }catch(err){
       alert('No se pudo unir a la ruleta: ' + err.message);
@@ -1344,14 +1576,12 @@
   }
 
   function logout(){
+    borrarSesion();
     currentUsername = '';
     currentPassword = '';
     isAdminUser = false;
-    tasksCompleted = [false, false, false, false];
-    activeAdIndex = null;
-    clearInterval(adCountdownInterval);
+    ruletaTareas = { round: 1, links: ['','','',''], completed: [false,false,false,false], pendientes: [] };
     stopChatPolling();
-    document.getElementById('adModalBg').classList.remove('open');
     document.getElementById('createMatchModalBg').classList.remove('open');
     document.getElementById('matchDetailModalBg').classList.remove('open');
     document.getElementById('createTaskModalBg').classList.remove('open');
@@ -1361,16 +1591,7 @@
     renderPremios();
     showMainTab('ruleta');
 
-    for(var i=1; i<=4; i++){
-      document.getElementById('check' + i).classList.remove('done');
-      document.getElementById('checkLabel' + i).textContent = '0/1';
-      var playBtn = document.querySelector('.mission-play[data-row="' + i + '"]');
-      if(playBtn) playBtn.classList.remove('done');
-    }
-
-    var pBtn = document.getElementById('participarBtn');
-    pBtn.disabled = true;
-    document.getElementById('participarHint').textContent = 'Completa las 4 misiones para participar';
+    renderRuletaTareas();
 
     document.getElementById('loginForm').reset();
     document.getElementById('registerForm').reset();
@@ -1475,6 +1696,7 @@
       renderParticipantsAdminList();
       lastSpinData = data.lastSpin || null;
       renderWinnerBox();
+      loadRuletaTareas();
     }catch(err){
       document.getElementById('spinCountdown').textContent = 'No se pudo conectar con el servidor.';
     }
@@ -1588,6 +1810,8 @@
     renderMatchesGrid();
     var createTaskCard = document.getElementById('createTaskCard');
     if(createTaskCard) createTaskCard.hidden = !admin;
+    var tareasBox = document.getElementById('adminTareasBox');
+    if(tareasBox) tareasBox.hidden = !admin;
   }
 
   function renderParticipantsAdminList(){
@@ -1730,7 +1954,7 @@
 
   /* ================== NAVEGACION Y AUTENTICACION ================== */
   function goToPage(n){
-    for(var i=1; i<=8; i++){
+    for(var i=1; i<=9; i++){
       var el = document.getElementById('page' + i);
       if(el) el.classList.toggle('active', n === i);
     }
@@ -1739,6 +1963,7 @@
       loadSpinConfig();
       applyAdminUI();
       loadPremios();
+      loadRuletaTareas();
     }
     window.scrollTo(0,0);
   }
@@ -1785,13 +2010,8 @@
         currentPassword = rp;
         isAdminUser = !!data2.isAdmin;
       }
-      var badge = document.getElementById('wheelUsername');
-      if(badge) badge.textContent = '@' + currentUsername;
-      var panelName = document.getElementById('userPanelName');
-      if(panelName) panelName.textContent = '@' + currentUsername;
-      var avatar = document.getElementById('userAvatar');
-      if(avatar) avatar.textContent = currentUsername.charAt(0).toUpperCase();
-      applyAdminUI();
+      guardarSesion();
+      aplicarDatosUsuario();
       goToPage(3);
     }catch(err){
       document.getElementById(errId).textContent = err.message;
@@ -2533,7 +2753,13 @@
 
   /* ---------- lista de tareas ---------- */
   function taskIsOpen(t){
-    return t.status !== 'closed' && !!t.endsAt && Date.now() < t.endsAt;
+    return t.status === 'open' && !!t.endsAt && Date.now() < t.endsAt;
+  }
+
+  // Cancelada = el anfitrión la cerró. Finalizada = se acabó el cronómetro.
+  function taskEstadoTexto(t){
+    if(t.status === 'cancelled') return '🚫 Cancelado';
+    return '⏹ Finalizado';
   }
 
   function renderTasksGrid(){
@@ -2560,7 +2786,8 @@
       var timer = document.createElement('div');
       timer.className = 'task-timer' + (open ? '' : ' ended');
       timer.setAttribute('data-ends', t.endsAt || 0);
-      timer.textContent = open ? ('⏱ ' + formatCountdown(t.endsAt - Date.now())) : '⏹ Finalizada';
+      timer.setAttribute('data-task', t.id);
+      timer.textContent = open ? ('⏱ ' + formatCountdown(t.endsAt - Date.now())) : taskEstadoTexto(t);
       card.appendChild(timer);
 
       var title = document.createElement('div');
@@ -2627,8 +2854,9 @@
     var timer = document.createElement('div');
     timer.className = 'task-timer' + (open ? '' : ' ended');
     timer.setAttribute('data-ends', t.endsAt || 0);
+    timer.setAttribute('data-task', t.id);
     timer.style.margin = '6px auto 12px';
-    timer.textContent = open ? ('⏱ ' + formatCountdown(t.endsAt - Date.now())) : '⏹ Tarea finalizada';
+    timer.textContent = open ? ('⏱ ' + formatCountdown(t.endsAt - Date.now())) : taskEstadoTexto(t);
     card.appendChild(timer);
 
     if(t.description){
@@ -2657,7 +2885,7 @@
       var joinBtn = document.createElement('button');
       joinBtn.className = 'cta big';
       joinBtn.style.marginTop = '10px';
-      if(!open){ joinBtn.textContent = 'La tarea ya terminó'; joinBtn.disabled = true; }
+      if(!open){ joinBtn.textContent = t.status === 'cancelled' ? 'Tarea cancelada' : 'La tarea ya terminó'; joinBtn.disabled = true; }
       else if(isFull){ joinBtn.textContent = 'Tarea llena'; joinBtn.disabled = true; }
       else { joinBtn.textContent = 'Participar'; joinBtn.onclick = function(){ participateTask(t.id); }; }
       card.appendChild(joinBtn);
@@ -2787,6 +3015,17 @@
       closeTaskBtn.onclick = function(){ adminCloseTask(t.id); };
       adminRow.appendChild(closeTaskBtn);
 
+      var deleteBtn = document.createElement('button');
+      deleteBtn.className = 'admin-mini-btn';
+      deleteBtn.style.marginTop = '10px';
+      deleteBtn.style.marginLeft = '8px';
+      deleteBtn.style.background = 'rgba(255,255,255,.12)';
+      deleteBtn.style.color = 'var(--text)';
+      deleteBtn.textContent = '🗑 Borrar tarea';
+      deleteBtn.title = 'La quita de la lista de todos los participantes';
+      deleteBtn.onclick = function(){ adminDeleteTask(t.id); };
+      adminRow.appendChild(deleteBtn);
+
       card.appendChild(adminRow);
     }
 
@@ -2827,6 +3066,18 @@
     }catch(err){ alert('No se pudo cerrar: ' + err.message); }
   }
 
+  async function adminDeleteTask(id){
+    if(!confirm('¿Borrar esta tarea? Desaparecerá para todos los participantes.')) return;
+    try{
+      await apiPost('/api/admin/premios/tasks/' + encodeURIComponent(id) + '/delete', {
+        adminUser: currentUsername, adminPassword: currentPassword
+      });
+      premiosState.tasks = (premiosState.tasks || []).filter(function(x){ return x.id !== id; });
+      closeTaskDetailModal();
+      renderTasksGrid();
+    }catch(err){ alert('No se pudo borrar: ' + err.message); }
+  }
+
   function replaceTask(task){
     if(!task) return;
     var idx = (premiosState.tasks || []).findIndex(function(x){ return x.id === task.id; });
@@ -2848,7 +3099,9 @@
         els[i].textContent = '⏱ ' + formatCountdown(ends - now);
       } else {
         els[i].classList.add('ended');
-        els[i].textContent = isDetail ? '⏹ Tarea finalizada' : '⏹ Finalizada';
+        var tid = els[i].getAttribute('data-task');
+        var tt = tid ? findTask(tid) : null;
+        els[i].textContent = tt ? taskEstadoTexto(tt) : '⏹ Finalizado';
         if(ends && !premiosJustClosed[ends]){
           premiosJustClosed[ends] = true;
           setTimeout(function(){
@@ -2927,7 +3180,10 @@
   }
 
   /* ================== ARRANQUE ================== */
-  checkRefPage();
+  restaurarSesion();
+  if(!checkRefPage() && !checkDonePage() && currentUsername){
+    goToPage(3);
+  }
 </script>
 
 </body>

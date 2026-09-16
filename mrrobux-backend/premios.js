@@ -86,13 +86,17 @@ function makeCode(task) {
   return 'C' + Date.now().toString(36).toUpperCase().slice(-5);
 }
 
+/* Estados de una tarea:
+     open      -> corriendo, se puede participar y canjear codigos
+     finished  -> se acabo el cronometro
+     cancelled -> el anfitrion la cerro antes de tiempo                     */
 function taskIsOpen(task) {
-  return task.status !== 'closed' && Date.now() < task.endsAt;
+  return task.status === 'open' && Date.now() < task.endsAt;
 }
 
 function refreshTaskStatus(task) {
-  if (task.status !== 'closed' && Date.now() >= task.endsAt) {
-    task.status = 'closed';
+  if (task.status === 'open' && Date.now() >= task.endsAt) {
+    task.status = 'finished';
   }
   return task;
 }
@@ -268,9 +272,20 @@ function createPremiosRouter(opts) {
     if (!(await requireAdmin(req, res))) return;
     const task = findTask(req.params.id);
     if (!task) return res.status(404).json({ error: 'Tarea no encontrada.' });
-    task.status = 'closed';
+    // Cerrarla a mano es "cancelada"; si se acaba el tiempo sola es "finalizada".
+    if (task.status === 'open') task.status = 'cancelled';
     saveDb();
     res.json({ ok: true, task: publicTask(task, req.body.adminUser) });
+  });
+
+  /* ---- borrar tarea (desaparece para todos) ---- */
+  router.post('/api/admin/premios/tasks/:id/delete', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    const idx = db.tasks.findIndex((t) => t.id === req.params.id);
+    if (idx < 0) return res.status(404).json({ error: 'Tarea no encontrada.' });
+    db.tasks.splice(idx, 1);
+    saveDb();
+    res.json({ ok: true, deleted: req.params.id });
   });
 
   /* ---- participar en una tarea ---- */
