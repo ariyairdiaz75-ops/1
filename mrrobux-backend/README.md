@@ -135,3 +135,52 @@ mrrobux-backend/
   package.json    <- dependencias (express, cors, bcryptjs, nodemailer)
   data/           <- se crea sola: users.json, participants.json, lastSpin.json
 ```
+
+---
+
+## Zona de Premios (premios.js)
+
+`premios.js` agrega la pestaña **🎁 Premios** de la página: solicitudes para unirse,
+tareas con cronómetro, códigos de recomendación y el conteo de recomendados.
+
+Ya viene conectado en `server.js` (no hay que hacer nada más):
+
+```js
+app.set('trust proxy', 1);   // para leer la IP real detrás del proxy de Railway
+
+app.use(createPremiosRouter({
+  verifyAdmin: verifyAdmin,                       // la misma comprobación de elchinonmms
+  dataFile: path.join(DATA_DIR, 'premios.json')   // se guarda junto a los demás datos
+}));
+```
+
+### Rutas que agrega
+
+| Método | Ruta | Para qué |
+|---|---|---|
+| GET  | `/api/premios/state?username=` | Estado del usuario (miembro / pendiente / anfitrión) + tareas |
+| POST | `/api/premios/join-request` | Solicitar unirse a la zona de premios |
+| POST | `/api/admin/premios/accept` | El anfitrión acepta a una persona |
+| POST | `/api/admin/premios/reject` | El anfitrión rechaza a una persona |
+| POST | `/api/admin/premios/accept-all` | Aceptar **todas** las solicitudes pendientes |
+| POST | `/api/admin/premios/tasks` | Crear una tarea |
+| POST | `/api/admin/premios/tasks/:id/close` | Cerrar una tarea antes de tiempo |
+| POST | `/api/premios/tasks/:id/participate` | Un participante entra a la tarea |
+| POST | `/api/premios/tasks/:id/code` | Genera su código (solo una vez por tarea) |
+| GET  | `/api/premios/ref-info?taskId=` | Datos públicos para la página del código |
+| POST | `/api/premios/ref` | Canjear un código (suma 1 recomendado) |
+
+### Reglas que aplica el servidor
+
+- Solo `elchinonmms` puede aceptar solicitudes, crear y cerrar tareas
+  (usa la misma contraseña con bcrypt que el resto del panel).
+- Quien no esté aceptado no ve ninguna tarea.
+- Cada participante genera **un solo código por tarea**.
+- Cada **IP cuenta una sola vez por tarea**: si la misma persona vuelve a entrar al
+  link y pone un código otra vez (el mismo u otro), ya no suma. Al crear una tarea
+  nueva el conteo empieza de cero, porque las IP se guardan dentro de cada tarea.
+- Cuando se acaba el cronómetro la tarea se cierra sola.
+- Nadie ve el código de otra persona; solo el suyo (y el anfitrión).
+
+⚠️ Igual que el resto de los datos, `data/premios.json` se borra en cada despliegue de
+Railway si no hay un volumen persistente conectado.

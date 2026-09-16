@@ -5,7 +5,12 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 
+const createPremiosRouter = require('./premios');
+
 const app = express();
+// Railway pone un proxy delante: sin esto todas las visitas llegarian con la
+// misma IP interna y el conteo de recomendados contaria a todos como uno solo.
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json({ limit: '8mb' })); // mas grande para permitir la foto de portada de las partidas
 
@@ -392,6 +397,13 @@ app.post('/api/chat', async (req, res) => {
 
   res.json({ ok: true, messages });
 });
+
+// ---------- Zona de premios (solicitudes, tareas y codigos de recomendacion) ----------
+// Vive en premios.js y guarda sus datos en data/premios.json, junto a los demas.
+app.use(createPremiosRouter({
+  verifyAdmin: verifyAdmin,
+  dataFile: path.join(DATA_DIR, 'premios.json')
+}));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
